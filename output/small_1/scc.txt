@@ -1,0 +1,10 @@
+SCC count: 6
+Component 0: [5]
+Component 1: [4]
+Component 2: [3]
+Component 3: [2]
+Component 4: [1]
+Component 5: [0]
+Tarjan time (ns): 62700
+DFS visits: 6
+Edge scans: 5

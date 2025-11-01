@@ -1,0 +1,26 @@
+SCC count: 22
+Component 0: [21]
+Component 1: [20]
+Component 2: [19]
+Component 3: [18]
+Component 4: [17]
+Component 5: [16]
+Component 6: [15]
+Component 7: [14]
+Component 8: [13]
+Component 9: [12]
+Component 10: [11]
+Component 11: [10]
+Component 12: [9]
+Component 13: [8]
+Component 14: [7]
+Component 15: [6]
+Component 16: [5]
+Component 17: [4]
+Component 18: [3]
+Component 19: [2]
+Component 20: [1]
+Component 21: [0]
+Tarjan time (ns): 2473100
+DFS visits: 22
+Edge scans: 116

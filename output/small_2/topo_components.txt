@@ -1,0 +1,4 @@
+[0]
+Kahn pops: 1
+Kahn pushes: 1
+Kahn time: 20300

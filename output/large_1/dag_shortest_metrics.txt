@@ -1,0 +1,2 @@
+Relaxations: 28
+Time (ns): 2683900

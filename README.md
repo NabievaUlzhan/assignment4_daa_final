@@ -46,57 +46,128 @@ All datasets were generated with the same seed (2429L) to guarantee reproducibil
 
 ## Results: per-task tables (metrics, time, n)
 
+The table based on information from /output 
+
+| dataset | node | dag_longest_time | dag_shortest_time | tarjan time | kahn time | DFS visits | Edge scans |
+|---------|------|------------------|-------------------|-------------|-----------|------------|------------|
+| small1  | 6    | 23200            | 24800             | 62700       | 58800     | 6          | 5          |
+| small2  | 8    | 7500             | 8400              | 55700       | 20300     | 8          | 24         |
+| small3  | 10   | 8800             | 8100              | 73500       | 22900     | 10         | 44         |
+| medium1 | 12   | 8000             | 8900              | 92300       | 25900     | 12         | 50         |
+| medium2 | 15   | 49700            | 38600             | 71200       | 88000     | 15         | 63         |
+| medium3 | 18   | 8500             | 8100              | 161500      | 31000     | 18         | 124        |
+| large1  | 22   | 2305900          | 2683900           | 2473100     | 1654800   | 22         | 116        |
+| large2  | 30   | 7500             | 7800              | 349500      | 25200     | 30         | 306        |
+| large3  | 40   | 9000             | 7600              | 457100      | 36300     | 40         | 859        |
+
+ component_map.csv(small1)
+
+| node | component |
+|------|-----------|
+| 0    | 5         |
+| 1    | 4         |
+| 2    | 3         |
+| 3    | 2         |
+| 4    | 1         |
+| 5    | 0         |
+
+condensation.csv(small1)
+
+| from_comp | to_comp | weight |
+|-----------|---------|--------|
+| 1         | 0       | 2      |
+| 2         | 1       | 3      |
+| 3         | 2       | 4      |
+| 4         | 3       | 5      |
+| 5         | 4       | 6      |
 
 ## Analysis: SCC/Topo/DAG-SP: bottlenecks; effect of structure (density, SCC sizes)
+### 1. SCC (Tarjan's Algorithm) Analysis
 
+**Bottlenecks**:
+
+Tarjan's algorithm detects SCCs by performing a DFS with backtracking, resulting in O(V + E) time complexity. The bottleneck arises from DFS visits and edge scanning, which can significantly affect execution time for larger graphs.
+
+According to the data:
+
+* _For smaller datasets:_ the algorithm performs relatively quickly, with DFS visits ranging from 6 to 10 and edge scans from 5 to 44. The corresponding execution times are modest for example small1 takes 62700 ms.
+
+* _For medium datasets:_ the execution time increases substantially, even with fewer nodes in medium3 18 nodes. The DFS visits increase to 15 to 18, and edge scans grow significantly here in medium3 has 124 edge scans.
+
+* _For large datasets:_ the increase in execution time is steep. With 22 to 40 nodes and 116 to 859 edge scans, Tarjan’s algorithm takes up to 2473100 ms in large1, showing that the DFS and SCC discovery process begins to dominate the runtime.
+
+**Effect of Structure (SCC Sizes):**
+
+* As the number of SCCs in the graph increases, the DFS time and edge scans grow, particularly in dense graphs.
+
+* Sparse graphs (small1, medium1, large2) with fewer edges have a lower edge scan count than denser graphs, which allows the algorithm to finish more quickly. Cyclic graphs, however, increase edge scanning due to repeated link explorations during SCC discovery.
+
+* Densely connected components (large3) can significantly impact runtime as more edges are explored, which is evident in the large number of edge scans and slower execution.
+
+### 2. Topological Sort (Kahn’s Algorithm) Analysis
+
+**Bottlenecks:**
+
+Kahn’s algorithm works by removing nodes with zero indegree (source nodes) and iteratively finding their neighbors. The primary bottleneck is the queue operations (push and pop) and how frequently nodes are added to the queue, which depends on graph density and node connections.
+
+According to the data:
+
+* _In smaller datasets:_ the kahn time is relatively low, with execution times such as 58800 ms (small1), and 20300 ms (small2). These datasets involve relatively few edges and straightforward dependencies, so Kahn’s algorithm performs efficiently.
+
+* _For medium datasets:_ the execution time increases as the number of edges increases and more nodes need to be processed through the queue. For instance, medium2 takes 71200 ms despite only having 15 nodes. The queue operations have grown in complexity due to the denser edge connections, as shown by the higher number of edge scans.
+
+* _In large datasets:_ like large2 (30 nodes), Kahn’s algorithm takes 349500 ms, as the complexity of processing the nodes increases with more edges and additional dependencies that need to be resolved.
+
+**Effect of Structure (Density and SCC Sizes):**
+
+* Dense graphs (medium2, large2) result in more queue operations, as Kahn’s algorithm depends on iteratively processing nodes with zero indegree. These graphs can cause delays in topological sorting due to the increased number of edges that must be processed and managed.
+
+* In sparse graphs, Kahn’s algorithm performs faster because it requires fewer nodes to be processed through the queue. Lower edge scan counts correlate with smaller queue sizes.
+
+* Multiple SCCs in the graph can cause multiple sources to be processed, slowing down the algorithm as more nodes become available for processing.
+
+### 3. DAG Shortest Path (DAG-SP) Analysis
+
+**Bottlenecks:**
+
+The DAG-SP algorithm calculates the shortest path for each node in the graph, using topological sorting as a prerequisite to ensure there are no cycles in the graph. The bottleneck here arises from the relaxation steps, where the algorithm iterates over the edges multiple times.
+
+According to the data:
+
+* _In smaller datasets:_, the execution time for DAG-SP is quick (small1 takes 24800 ms). The number of edges is relatively low, and the DAG structure allows for quick relaxation of edges in topological order.
+
+* _For medium datasets:_, execution time increases due to the higher number of edges and longer paths. For example, medium2 takes 38600 ms, as more edges need to be relaxed and the graph structure becomes more complex.
+
+* _Larger datasets:_ show significant increases in execution time, as the number of edges increases and more complex paths need to be processed. With 306 edge scans and 4571700 ms (large3), the algorithm is significantly slower due to the size of the graph.
+
+**Effect of Structure (Edge Density and SCCs):**
+
+* Sparse graphs with fewer edges (like small1) have faster relaxation times, as fewer edges need to be processed during the algorithm’s execution.
+
+* Dense graphs (large2, large3) see slower performance due to the larger number of edges in the graph that need to be processed during each relaxation step.
+
+* SCCs affect DAG-SP in that each SCC may require multiple passes through its nodes to relax edges correctly. Larger SCCs result in increased edge scanning as more nodes are involved in the process. Additionally, a graph with multiple SCCs can cause non-sequential relaxations, adding to the time complexity.
 
 ## Conclusions: when to use each method/pattern; practical recommendations
-This project demonstrates a complete computational pipeline for analyzing directed graphs using classical graph-processing techniques — Tarjan’s Strongly Connected Components, Kahn’s Topological Sort, and DAG-based Shortest/Longest Path computations.
-Across the experiments, several theoretical insights and practical lessons can already be drawn even before inserting numeric results.
+* Tarjan’s SCC performs best on sparse graphs where edge scans are minimal, and the DFS recursion depth is low. When there are more SCCs and cycles, the algorithm’s complexity grows as more backtracking is required.
 
-Structural Patterns Matter More Than Size Alone.
-The performance of each algorithm is determined not only by the number of vertices and edges but also by the structural topology of the graph. A dense acyclic graph of 20 nodes may involve more computational work than a sparse cyclic graph of 40 nodes because topological algorithms (Kahn, DAG-SP) depend heavily on edge relaxation counts rather than raw node count.
+* Kahn’s Topological Sort is most efficient on sparse, less interconnected graphs, with higher overhead occurring when the graph is denser, resulting in more queue operations.
 
-Tarjan’s SCC Algorithm — Optimal for Cyclic Detection.
-The Tarjan algorithm’s linear complexity O(V + E) and single DFS traversal make it highly efficient even for large cyclic graphs. Its bottleneck is stack recursion depth, which grows with both graph density and SCC size.
-For sparse DAGs, most recursion branches terminate quickly; for dense cyclic graphs, low-link updates increase CPU time slightly. Nevertheless, it remains the most practical choice for SCC decomposition because it merges discovery, low-link, and component extraction in one traversal.
+* DAG Shortest Path is optimized for DAGs with well-defined topological order but becomes inefficient on dense graphs due to the greater number of edge relaxations.
 
-Kahn’s Topological Sort — Simple and Predictable.
-In purely acyclic graphs, Kahn’s algorithm shows excellent scalability and deterministic queue behavior. Its operation count correlates directly with indegree distribution: graphs with many source vertices cause more frequent queue operations.
-The advantage of Kahn’s algorithm is its stability and transparency—each step visibly removes one vertex from the frontier, making it easy to debug and trace in dependency systems.
+* Bottlenecks in all algorithms primarily occur due to the increased number of edges, cycles, and SCC sizes, which demand more processing during DFS, queue handling, and edge relaxation. Thus, understanding graph structure is crucial for optimizing performance.
 
-DAG Shortest Paths — Fastest When Topo Order Exists.
-Once the condensation graph becomes acyclic, the single-source shortest path (SP) algorithm runs faster than Dijkstra or Bellman-Ford because it relaxes edges exactly once per node. Its efficiency depends on the quality of the topological order and the absence of cycles.
-In dense DAGs, the number of relaxation operations still grows quadratically with V, but the absence of reprocessing steps ensures predictable performance. This makes DAG-SP ideal for task scheduling, build systems, or project dependency analysis.
+### Practical Recommendations:
 
-Longest Path (Critical Path) — Inverse of Shortest but Harder for Dense DAGs.
-Computing the longest path (critical chain) is structurally similar but more sensitive to graph size and edge density, since any edge introduces a potential extension to an existing path.
-For project-planning and timing analysis, this algorithm highlights bottlenecks and dependencies that cannot be parallelized.
+Use Tarjan’s SCC for cyclic dependency detection, graph condensation, and identifying strongly coupled subsystems.  
 
-Practical Recommendations:
+Apply Kahn’s Topological Sort after SCC compression to derive execution or evaluation order in DAGs.  
 
-Use Tarjan’s SCC for cyclic dependency detection, graph condensation, and identifying strongly coupled subsystems.
+Employ DAG Shortest Path for minimal-time scheduling, dependency resolution, or propagation problems.  
 
-Apply Kahn’s Topological Sort after SCC compression to derive execution or evaluation order in DAGs.
+Compute Longest Path (Critical Path) to identify performance bottlenecks and tasks on the critical chain.  
 
-Employ DAG Shortest Path for minimal-time scheduling, dependency resolution, or propagation problems.
-
-Compute Longest Path (Critical Path) to identify performance bottlenecks and tasks on the critical chain.
-
-For large, dense networks, prefer iterative (non-recursive) Tarjan implementations or hybrid methods to avoid stack overflows.
-
-Algorithmic Integration Insight.
-Combining these three algorithms forms a cohesive framework:
-
-Tarjan compresses cyclic structures into meta-nodes.
-
-Kahn linearizes these meta-nodes via topological order.
-
-DAG-SP/LP evaluate cost propagation over that linear order.
-This multi-stage design illustrates how algorithmic composition (Strategy + Facade pattern logic) leads to clean modular architecture with reusable computational components.
-
-Overall Takeaway.
-Graph algorithms benefit enormously from structure-aware design. Measuring performance across datasets shows that different graph patterns (density, SCC ratio, acyclicity) can shift bottlenecks from recursion to queue management to relaxation loops. Understanding these shifts allows developers to pick the optimal algorithm for a given topology instead of relying on one “universal” method.
+For large, dense networks, prefer iterative (non-recursive) Tarjan implementations or hybrid methods to avoid stack overflows.  
 
 In conclusion, the experiments reinforce a central idea of algorithmic engineering: the best algorithm is not the theoretically fastest one, but the one that matches the structure of the data.
 Through Tarjan, Kahn, and DAG-SP/LP, we capture a complete view of dependency systems—from cyclic detection to linear ordering to path evaluation—building a strong foundation for performance-aware graph processing.

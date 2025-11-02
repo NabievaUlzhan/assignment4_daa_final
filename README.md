@@ -13,6 +13,8 @@ vs dense, single SCC vs multiple SCCs).
 | **Medium**   | 10–20         | Mixed structures containing several strongly connected components | 3 (`medium_1.json`, `medium_2.json`, `medium_3.json`) | 25–60                 |
 | **Large**    | 20–50         | Performance-oriented datasets with dense and cyclic connections   | 3 (`large_1.json`, `large_2.json`, `large_3.json`)    | 80–200+               |
 
+![img_2.png](img_2.png)
+
 ### Weight Model
 
 All datasets use edge-weighted graphs where each directed edge u → v carries a randomly assigned positive integer weight

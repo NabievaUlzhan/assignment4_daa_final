@@ -13,7 +13,6 @@ vs dense, single SCC vs multiple SCCs).
 | **Medium**   | 10–20         | Mixed structures containing several strongly connected components | 3 (`medium_1.json`, `medium_2.json`, `medium_3.json`) | 25–60                 |
 | **Large**    | 20–50         | Performance-oriented datasets with dense and cyclic connections   | 3 (`large_1.json`, `large_2.json`, `large_3.json`)    | 80–200+               |
 
-![img_2.png](img_2.png)
 
 ### Weight Model
 
@@ -61,6 +60,8 @@ The table based on information from /output
 | large1  | 22   | 2305900          | 2683900           | 2473100     | 1654800   | 22         | 116        |
 | large2  | 30   | 7500             | 7800              | 349500      | 25200     | 30         | 306        |
 | large3  | 40   | 9000             | 7600              | 457100      | 36300     | 40         | 859        |
+
+<img src="graph1.png"></img>
 
  component_map.csv(small1)
 

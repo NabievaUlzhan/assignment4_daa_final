@@ -7,7 +7,8 @@ import java.util.List;
 public class DAGLongestPath {
     public static class Result {
         public int[] dist;
-        public int[] prev; }
+        public int[] prev;
+    }
 
     public Result run(List<List<Edge>> dag, int sourceComp, List<Integer> topo, Metrics metrics){
         int n = dag.size();
@@ -24,6 +25,7 @@ public class DAGLongestPath {
             List<Edge> list = dag.get(u);
             for (int t=0;t<list.size();t++){
                 Edge e = list.get(t);
+                //Longest path on the DAG (via sign inversion or max-DP over topo order)
                 int v=e.getTo(), nd=dist[u]+e.getW();
                 if (nd>dist[v]){
                     dist[v]=nd;

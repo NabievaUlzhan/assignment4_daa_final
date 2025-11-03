@@ -13,13 +13,15 @@ public class DatasetGenerator {
         File dataDir = new File("data");
         if (!dataDir.exists()) Files.createDirectories(dataDir.toPath());
         Random rnd = new Random(2429);
-
+        //small
         makeDataset(dataDir, "small_1.json", 6,  true, 1,  "dag_sparse", rnd, 0.30, false);
         makeDataset(dataDir, "small_2.json", 8,  true, 0,  "one_cycle",  rnd, 0.40, true);
         makeDataset(dataDir, "small_3.json", 10, true, 4,  "two_cycles", rnd, 0.45, true);
+        //medium
         makeDataset(dataDir, "medium_1.json", 12, true, 0,  "mixed_sccs", rnd, 0.35, true);
         makeDataset(dataDir, "medium_2.json", 15, true, 2,  "dag_dense",  rnd, 0.60, false); // FIX: no hang
         makeDataset(dataDir, "medium_3.json", 18, true, 5,  "multi_sccs", rnd, 0.40, true);
+        //large
         makeDataset(dataDir, "large_1.json", 22, true, 0,  "perf_dag",   rnd, 0.50, false);
         makeDataset(dataDir, "large_2.json", 30, true, 4,  "perf_mixed", rnd, 0.35, true);
         makeDataset(dataDir, "large_3.json", 40, true, 10, "perf_dense", rnd, 0.55, true);
@@ -34,18 +36,19 @@ public class DatasetGenerator {
                 ", allowCycles=" + allowCycles + ")");
 
         List<EdgeData> edges = new ArrayList<EdgeData>();
+        //basic chain so graph is connected
         for (int i = 0; i < n - 1; i++) {
             int w = 1 + rnd.nextInt(9);
             edges.add(new EdgeData(i, i + 1, w));
         }
-
+        //max possible number of unique edges
         int maxEdges;
         if (allowCycles) {
             maxEdges = n * (n - 1);
         } else {
             maxEdges = n * (n - 1) / 2;
         }
-
+        //target weight of edges
         int target = Math.max(n - 1, (int) Math.round(density * maxEdges));
         if (!allowCycles) {
             target = Math.min(target, maxEdges);

@@ -9,7 +9,6 @@ public class TarjanSCC {
     private final List<List<Edge>> adj;
     private final int n;
     private final Metrics metrics;
-
     private int time;
     private final int[] disc, low, compId;
     private final boolean[] inStack;

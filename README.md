@@ -130,6 +130,7 @@ According to the data:
 * Multiple SCCs in the graph can cause multiple sources to be processed, slowing down the algorithm as more nodes become available for processing.
 
 ### 3. DAG Shortest Path (DAG-SP) Analysis
+**I used edge-weighted DAGs. All path costs are computed as the sum of edge weights**  
 
 **Bottlenecks:**
 
@@ -175,3 +176,7 @@ For large, dense networks, prefer iterative (non-recursive) Tarjan implementatio
 In conclusion, the experiments reinforce a central idea of algorithmic engineering: the best algorithm is not the theoretically fastest one, but the one that matches the structure of the data.
 Through Tarjan, Kahn, and DAG-SP/LP, we capture a complete view of dependency systems—from cyclic detection to linear ordering to path evaluation—building a strong foundation for performance-aware graph processing.
 
+### Run instructions 
+mvn -q -DskipTests package  
+java -cp target/classes app.DatasetGenerator  
+java -cp target/classes app.Main "data"  

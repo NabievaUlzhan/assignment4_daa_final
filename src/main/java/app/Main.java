@@ -115,6 +115,7 @@ public class Main {
             fw.write("Kahn pushes: " + mKahn.get("kahn.push") + "\n");
             fw.write("Kahn time: " + mKahn.getElapsedNanos() + "\n");
         }
+        //Output a valid order of components and a derived order of original tasks after SCC compression.
         List<Integer> expandedTopo = expandTopoToOriginal(topo, comps);
         try (FileWriter fw = new FileWriter(new File(outDir, "topo_expanded.txt"))) {
             fw.write(expandedTopo.toString());

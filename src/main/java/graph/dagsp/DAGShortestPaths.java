@@ -13,6 +13,7 @@ public class DAGShortestPaths {
     public Result run(List<List<Edge>> dag, int sourceComp, List<Integer> topo, Metrics metrics){
         int n = dag.size();
         int[] dist = new int[n], prev = new int[n];
+        //Single-source shortest paths on the DAG
         for (int i=0;i<n;i++){
             dist[i]=Integer.MAX_VALUE/4;
             prev[i]=-1;

@@ -4,6 +4,7 @@ import model.EdgeData;
 import java.util.ArrayList;
 import java.util.List;
 
+//Build the condensation graph (a DAG of components)
 public class CondensationBuilder {
     public List<List<Edge>> build(int n, List<EdgeData> edges, int[] compId, int compCount, boolean directed){
         List<List<Edge>> dag = new ArrayList<List<Edge>>();
